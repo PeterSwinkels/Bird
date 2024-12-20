@@ -1,6 +1,6 @@
 DEFINT A-Z
+DECLARE SUB DrawBird (x, y, BirdFrame)
 DECLARE SUB Drawlandscape ()
-DECLARE SUB DrawBird (x, y, Offset)
 DECLARE SUB Initialize ()
 DECLARE SUB Intro ()
 DECLARE SUB LoadBird ()
@@ -10,27 +10,27 @@ DECLARE SUB Quit ()
 
 DIM SHARED Background(0 TO 7)
 DIM SHARED Bird(0 TO 31)
+DIM SHARED BirdFrame
 DIM SHARED Landscape(0 TO 16001)
-DIM SHARED Offset
 
 Initialize
 Intro
 CALL Main
 
-Flap:
+FlapWings:
  PLAY "N0"
 
- IF Offset = 0 THEN
-  Offset = 16
+ IF BirdFrame = 16 THEN
+  BirdFrame = 0
  ELSE
-  Offset = 0
+  BirdFrame = BirdFrame + 16
  END IF
 RETURN
 
-SUB DrawBird (x, y, Offset)
+SUB DrawBird (x, y, BirdFrame)
  GET (x, y)-STEP(2, 2), Background(0)
- PUT (x, y), Bird(Offset + 8), AND
- PUT (x, y), Bird(Offset + 0), XOR
+ PUT (x, y), Bird(BirdFrame + 8), AND
+ PUT (x, y), Bird(BirdFrame), XOR
  PCOPY 1, 0
  PUT (x, y), Background(0), PSET
 END SUB
@@ -42,7 +42,9 @@ SUB Initialize
  LoadLandscape
  LoadBird
 
- ON PLAY(1) GOSUB Flap
+ BirdFrame = 0
+
+ ON PLAY(1) GOSUB FlapWings
  PLAY ON
  PLAY "MB MS N0"
 END SUB
@@ -50,7 +52,7 @@ END SUB
 SUB Intro
  COLOR 15
 
- PRINT "Bird v1.00 - by: Peter Swinkels, 2024"
+ PRINT "Bird v1.01 - by: Peter Swinkels, 2024"
  PRINT
  PRINT "In this sprite demo the user controls"
  PRINT "a bird flying across a landscape."
@@ -78,12 +80,11 @@ END SUB
 SUB Main
  BirdX = 160
  BirdY = 100
- Offset = 0
 
  PUT (0, 0), Landscape(0), PSET
 
  DO
-  DrawBird BirdX, BirdY, Offset
+  DrawBird BirdX, BirdY, BirdFrame
   Key$ = INKEY$
   SELECT CASE Key$
    CASE CHR$(0) + "H"
