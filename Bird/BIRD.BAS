@@ -7,9 +7,10 @@ DECLARE SUB LoadBird ()
 DECLARE SUB LoadLandscape ()
 DECLARE SUB Main ()
 DECLARE SUB Quit ()
+DECLARE SUB ScrollBackground (Direction)
 
-DIM SHARED Background(0 TO 7)
 DIM SHARED Bird(0 TO 31)
+DIM SHARED BirdBackground(0 TO 7)
 DIM SHARED BirdFrame
 DIM SHARED Landscape(0 TO 16001)
 
@@ -28,11 +29,11 @@ FlapWings:
 RETURN
 
 SUB DrawBird (x, y, BirdFrame)
- GET (x, y)-STEP(2, 2), Background(0)
+ GET (x, y)-STEP(2, 2), BirdBackground(0)
  PUT (x, y), Bird(BirdFrame + 8), AND
  PUT (x, y), Bird(BirdFrame), XOR
  PCOPY 1, 0
- PUT (x, y), Background(0), PSET
+ PUT (x, y), BirdBackground(0), PSET
 END SUB
 
 SUB Initialize
@@ -90,11 +91,19 @@ SUB Main
    CASE CHR$(0) + "H"
     IF BirdY > 0 THEN BirdY = BirdY - 1
    CASE CHR$(0) + "P"
-    IF BirdY < 196 THEN BirdY = BirdY + 1
+    IF BirdY < 197 THEN BirdY = BirdY + 1
    CASE CHR$(0) + "K"
-    IF BirdX > 0 THEN BirdX = BirdX - 1
+    IF BirdX <= 80 THEN
+     ScrollBackground -1
+    ELSE
+     BirdX = BirdX - 1
+    END IF
    CASE CHR$(0) + "M"
-    IF BirdX < 316 THEN BirdX = BirdX + 1
+    IF BirdX >= 240 THEN
+     ScrollBackground 1
+    ELSE
+     BirdX = BirdX + 1
+    END IF
    CASE CHR$(27)
     Quit
   END SELECT
@@ -104,5 +113,23 @@ END SUB
 SUB Quit
  PLAY STOP
  SYSTEM
+END SUB
+
+SUB ScrollBackground (Direction)
+DIM Background(0 TO 12800)
+DIM Edge(0 TO 175)
+
+ SELECT CASE Direction
+  CASE -1
+   GET (319, 70)-(319, 150), Edge
+   GET (0, 70)-(318, 150), Background
+   PUT (1, 70), Background, PSET
+   PUT (0, 70), Edge, PSET
+  CASE 1
+   GET (0, 70)-(0, 150), Edge
+   GET (1, 70)-(319, 150), Background
+   PUT (0, 70), Background, PSET
+   PUT (319, 70), Edge, PSET
+ END SELECT
 END SUB
 
