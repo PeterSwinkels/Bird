@@ -1,5 +1,5 @@
 DEFINT A-Z
-DECLARE SUB DrawBird (x, y, BirdFrame)
+DECLARE SUB DrawBird (x AS INTEGER, y AS INTEGER, BirdFrame AS INTEGER)
 DECLARE SUB Drawlandscape ()
 DECLARE SUB Initialize ()
 DECLARE SUB Intro ()
@@ -7,12 +7,12 @@ DECLARE SUB LoadBird ()
 DECLARE SUB LoadLandscape ()
 DECLARE SUB Main ()
 DECLARE SUB Quit ()
-DECLARE SUB ScrollBackground (Direction)
+DECLARE SUB ScrollBackground (Direction AS INTEGER)
 
-DIM SHARED Bird(0 TO 31)
-DIM SHARED BirdBackground(0 TO 7)
-DIM SHARED BirdFrame
-DIM SHARED Landscape(0 TO 16001)
+DIM SHARED Bird(0 TO 31) AS INTEGER
+DIM SHARED BirdBackground(0 TO 7) AS INTEGER
+DIM SHARED BirdFrame AS INTEGER
+DIM SHARED Landscape(0 TO 16001) AS INTEGER
 
 Initialize
 Intro
@@ -28,7 +28,7 @@ FlapWings:
  END IF
 RETURN
 
-SUB DrawBird (x, y, BirdFrame)
+SUB DrawBird (x AS INTEGER, y AS INTEGER, BirdFrame AS INTEGER)
  GET (x, y)-STEP(2, 2), BirdBackground(0)
  PUT (x, y), Bird(BirdFrame + 8), AND
  PUT (x, y), Bird(BirdFrame), XOR
@@ -36,7 +36,7 @@ SUB DrawBird (x, y, BirdFrame)
  PUT (x, y), BirdBackground(0), PSET
 END SUB
 
-SUB Initialize
+SUB Initialize ()
  SCREEN 7, , 1, 0
  CLS
 
@@ -50,10 +50,10 @@ SUB Initialize
  PLAY "MB MS N0"
 END SUB
 
-SUB Intro
+SUB Intro ()
  COLOR 15
 
- PRINT "Bird v1.01 - by: Peter Swinkels, 2024"
+ PRINT "Bird v1.02 - by: Peter Swinkels, 2024"
  PRINT
  PRINT "In this sprite demo the user controls"
  PRINT "a bird flying across a landscape."
@@ -68,17 +68,21 @@ SUB Intro
  LOOP WHILE INKEY$ = ""
 END SUB
 
-SUB LoadBird
+SUB LoadBird ()
  DEF SEG = VARSEG(Bird(0))
  BLOAD "Bird.dat", VARPTR(Bird(0))
 END SUB
 
-SUB LoadLandscape
+SUB LoadLandscape ()
  DEF SEG = VARSEG(Landscape(0))
  BLOAD "Landscap.dat", VARPTR(Landscape(0))
 END SUB
 
-SUB Main
+SUB Main ()
+DIM BirdX AS INTEGER
+DIM BirdY AS INTEGER
+DIM KeyStroke AS STRING
+
  BirdX = 160
  BirdY = 100
 
@@ -86,8 +90,8 @@ SUB Main
 
  DO
   DrawBird BirdX, BirdY, BirdFrame
-  Key$ = INKEY$
-  SELECT CASE Key$
+  KeyStroke = INKEY$
+  SELECT CASE KeyStroke
    CASE CHR$(0) + "H"
     IF BirdY > 0 THEN BirdY = BirdY - 1
    CASE CHR$(0) + "P"
@@ -110,14 +114,14 @@ SUB Main
  LOOP
 END SUB
 
-SUB Quit
+SUB Quit ()
  PLAY STOP
  SYSTEM
 END SUB
 
-SUB ScrollBackground (Direction)
-DIM Background(0 TO 12800)
-DIM Edge(0 TO 175)
+SUB ScrollBackground (Direction AS INTEGER)
+DIM Background(0 TO 12800) AS INTEGER
+DIM Edge(0 TO 175) AS INTEGER
 
  SELECT CASE Direction
   CASE -1
